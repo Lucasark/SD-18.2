@@ -2,11 +2,100 @@
 #include <stdio.h>
 #include <string.h>
 #include "mpi.h"
+#define MAX 256
 
 int checkForKey(){
 	return 0;
-}//Deve ser implementado,pode ter quantos parametros quiser,ou ser feito la no for que eh chamado tanto faz.
+}
 
+
+//Checkar os genes
+int bmhs(char *string, int n, char *substr, int m) {
+
+	int d[MAX];
+	int i, j, k;
+
+	// pre-processing
+	for (j = 0; j < MAX; j++)
+		d[j] = m + 1;
+	for (j = 0; j < m; j++)
+		d[(int) substr[j]] = m - j;
+
+	// searching
+	i = m - 1;
+	while (i < n) {
+		k = i;
+		j = m - 1;
+		while ((j >= 0) && (string[k] == substr[j])) {
+			j--;
+			k--;
+		}
+		if (j < 0)
+			return k + 1;
+		i = i + d[(int) string[i + 1]];
+	}
+
+	return -1;
+}
+
+//Deve ser implementado,pode ter quantos parametros quiser,ou ser feito la no for que eh chamado tanto faz.
+
+//Funcoes do FILE
+
+FILE *fdatabase, *fquery, *fout;
+
+//Ler o file
+
+void openfiles() {
+
+	fdatabase = fopen("dna.in", "r+");
+	if (fdatabase == NULL) {
+		perror("dna.in");
+		exit(EXIT_FAILURE);
+	}
+
+	fquery = fopen("query.in", "r");
+	if (fquery == NULL) {
+		perror("query.in");
+		exit(EXIT_FAILURE);
+	}
+
+	fout = fopen("dna.out", "w");
+	if (fout == NULL) {
+		perror("fout");
+		exit(EXIT_FAILURE);
+	}
+
+}
+
+//Fechar o file :D (Obivuos)
+
+void closefiles() {
+	fflush(fdatabase);
+	fclose(fdatabase);
+
+	fflush(fquery);
+	fclose(fquery);
+
+	fflush(fout);
+	fclose(fout);
+}
+
+
+//Remover o \n ou \r de cada string
+
+inline void remove_eol(char *line) {
+	int i = strlen(line) - 1;
+	while (line[i] == '\n' || line[i] == '\r') {
+		line[i] = 0;
+		i--;
+	}
+}
+
+char *bases;
+char *str;
+
+//funcao MPI
 
 int main(int argc,char** argv){
 
