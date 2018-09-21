@@ -92,8 +92,6 @@ inline void remove_eol(char *line) {
 	}
 }
 
-char *bases;
-char *str;
 
 //funcao MPI
 
@@ -113,14 +111,34 @@ int main(int argc,char** argv){
 
 	int genes_tam=0;		//TOdos podem iniciar essas duas
 	int chave_tam=0;
-
+	char* chave;
+	char* genes;
 	if(meu_rank==0){
+
+		openfiles(); //abre os arquivos e nome eles na funcao
+		
+
 		/*
 		IO
 		Aqui vai o programa que recupera a string da chave e do genes (sequencia genetica), e deve guardar essas informacoes
 		nas variaveis logo abaixo (que serao char*).
 		*/
-		char* chave; char* genes;
+		
+		//
+
+		genes = (char*) malloc(sizeof(char) * 1000001);
+		if (genes == NULL) {
+			perror("malloc genes");
+			exit(EXIT_FAILURE);
+		}
+
+		chave = (char*) malloc(sizeof(char) * 1000001);
+		if (chave == NULL) {
+			perror("malloc chave");
+			exit(EXIT_FAILURE);
+		}
+
+		openfiles();
 
 		genes_tam = sizeof(genes)/sizeof(char*);
 		chave_tam = sizeof(chave)/sizeof(char*);
