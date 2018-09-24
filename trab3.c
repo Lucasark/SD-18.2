@@ -1,12 +1,21 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "mpi.h"
 
-int checkForKey();//Deve ser implementado,pode ter quantos parametros quiser,ou ser feito la no for que eh chamado tanto faz.
+int checkForKey(){}//Deve ser implementado,pode ter quantos parametros quiser,ou ser feito la no for que eh chamado tanto faz.
 
+void remove_eol(char *line) {
+	int i = strlen(line) - 1;
+	while (line[i] == '\n' || line[i] == '\r') {
+		line[i] = 0;
+		i--;
+	}
+}
 
 int main(int argc,char** argv){
 	
+
 	int meu_rank,np,tag=0;
 	int to=0;
 	MPI_Status status;
@@ -28,7 +37,11 @@ int main(int argc,char** argv){
 		Aqui vai o programa que recupera a string da chave e do genes (sequencia genetica), e deve guardar essas informacoes
 		nas variaveis logo abaixo (que serao char*).
 		*/
-		char* chave;char* genes;
+		char chave[] = "ABC";
+		char genes[] = "FODASSEEEEEEABCABCAHEHEHUAHUAABCABC";
+
+		remove_eol(chave);
+		remove_eol(genes);
 
 		genes_tam = sizeof(genes)/sizeof(char*);
 		chave_tam = sizeof(chave)/sizeof(char*);
@@ -39,21 +52,27 @@ int main(int argc,char** argv){
 
 		char *block=(char *)malloc(block_tam*sizeof(char));		//criando espaco para enviar os genes necessarios
 		
+		printf("Esse eh meu RANK %d\n", meu_rank);
+
 		int init_index=0;
 		for (to = 1; to < nt; to++){//agora enviaremos para cada processo a chave,enviarah a parte necessaria da string de genes, o resto eh deduzivel  (menos mensagem)
 			
 			//strncpy(dest, src + init_index, block_tam);Destino,fala qual array comeca
 
-			strncpy(block,genes + init_index, block_tam);  //pega o que eh relevante pro processo da vez e coloca em block
+			printf("flag 0\n");
 
-			MPI_Send(chave_tam,
+			//strncpy(block,genes + init_index, block_tam-1);  //pega o que eh relevante pro processo da vez e coloca em block
+
+			printf("flag 1 \n");
+
+			MPI_Send(&chave_tam,
 						1,
 						MPI_INT,
 						to,
 						tag,
 						MPI_COMM_WORLD);
 
-			MPI_Send(block_tam,
+			MPI_Send(&block_tam,
 						1,  //ja equivale a strlen(block)+1,fica menos processamento
 						MPI_INT,
 						to,
@@ -74,9 +93,9 @@ int main(int argc,char** argv){
 						tag,
 						MPI_COMM_WORLD);
 
-
+			printf("flag 2 \n");
 			init_index += chave_tam;		//update de onde comeca os "genes" que serao enviados
-		 } 
+		} 
 
 		//aqui eh o envio apenas para o ultimo processo
 		//obs perceba que o ultimo eh nt, pois se tivessemos 6 processos,np=6 ,nt=5, e os processos sao 0,1,2,3,4,5. OU seja nt eh o ultimo
@@ -87,14 +106,16 @@ int main(int argc,char** argv){
 
 		strncpy(block,genes + init_index, block_tam);  //fazendo o mesmo processo de antes mas a quantidade que eh pega eh menor (ou igual),relativo ao resto que der da divisao
 
-		MPI_Send(chave_tam,
+		printf("%s\n",block);
+			printf("flag 3 \n");
+		MPI_Send(&chave_tam,
 			 		1,
 				 	MPI_INT,
 				 	to,
 				 	tag,
 				 	MPI_COMM_WORLD);
 
-		MPI_Send(block_tam,
+		MPI_Send(&block_tam,
 					1,
 					MPI_INT,
 					to,
@@ -119,49 +140,64 @@ int main(int argc,char** argv){
 		/*
 		AQUI PREPARAR O 0 PARA RECEER O REDULCE
 		*/
-
+		printf("flag 4 \n");
 	}else{	// caso voce nao seja o ultimo processo,uma vez qeu esse em ver de receber um overlap ele recebe o que sobra da divisao
 		
 		//MPI_receive
+		printf("Meu rank eh : %d\n", meu_rank);
 
 		//RECEBE TAMANHO DA CHAVE
-		MPI_Recv(chave_tam,
+		MPI_Recv(&chave_tam,
 					1,
 					MPI_INT,
 					0,
 					tag,
 					MPI_COMM_WORLD,
 					&status);
+		printf("Meu Rank eh : %d , Tamanho da chave : %d\n", meu_rank,chave_tam);
 		//RECEBE TAMANHO DO BLOCO A SER PROCESSADO
-		MPI_Recv(block_tam,
+
+		printf("flag 5 rank:%d\n",meu_rank);
+
+		MPI_Recv(&block_tam,
 					1,
 					MPI_INT,
 					0,
 					tag,
 					MPI_COMM_WORLD,
 					&status);
+		printf("Meu Rank eh : %d , Tamanho do bloco : %d\n", meu_rank,block_tam);
+
+		printf("flag 6 rank:%d\n",meu_rank);
 
 		//ALCANDO MEMORIA PARA CHAVE E BLOCO
-		char* chave= (char*)malloc(chave_tam*sizeof(char));
+		char* chave= (char*) malloc(chave_tam*sizeof(char));
 
-		char* block= (char*)malloc(block_tam*sizeof(char));
+		char* block= (char*) malloc(block_tam*sizeof(char));
 
+		printf("flag 7 rank:%d\n",meu_rank);
 		//RECEBENDO A CHAVE
 		MPI_Recv(chave,
-					100,
+					chave_tam+1,
 					MPI_CHAR,
 					0,
 					tag,
 					MPI_COMM_WORLD,
 					&status);
+
+		printf("Meu Rank eh : %d , A chave eh : %s\n", meu_rank,chave);
+		
+		printf("flag 8 rank:%d\n",meu_rank);	
 		//RECEBENDO O BLOCO
 		MPI_Recv(block,
-					100,
+					block_tam+1,
 					MPI_CHAR,
 					0,
 					tag,
 					MPI_COMM_WORLD,
 					&status);
+
+		printf("Meu Rank eh : %d , Meu bloco eh : %s\n", meu_rank,block);
 
 		int key_total;
 
@@ -179,14 +215,15 @@ int main(int argc,char** argv){
 		Teste 6 = FGHI
 		*/
 
+		printf("flag 9 rank:%d\n",meu_rank);
 		int repetitions = (block_tam - chave_tam) +1;
-		int i
+		int i=0;
 		for (i = 0; i < repetitions; ++i){
 			if(checkForKey()){ 				//criar metodo checkForKey
 				key_total++;
 			}
 		}
-
+		
 		//Aqui tem que fazer o REDULCE, pro 0 receber tudo
 	}
 
