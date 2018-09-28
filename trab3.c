@@ -101,7 +101,7 @@ int main(int argc,char** argv){
 				//chave=chave_list[chave_ctrl];			<==
 
 				char chave[] = "ABC";
-				char genes[] = "FODASSEEEEEEABCABCAHEHEHUAHUAABCABC";
+				char genes[] = "FODAABCSSEERTABC3EFABCABCAHEABCHEHUAHUAABCABC";
 
 				genes_tam = sizeof(genes)/sizeof(char)-1;		//CUidado com esse -1 ele eh para passarmos sem contar o \0
 				chave_tam = sizeof(chave)/sizeof(char)-1;
@@ -202,7 +202,8 @@ int main(int argc,char** argv){
 
 
 			}else{
-				
+
+
 				//MPI_receive
 				
 
@@ -238,10 +239,7 @@ int main(int argc,char** argv){
 							tag,
 							MPI_COMM_WORLD,
 							&status);
-
-				printf("Meu Rank eh : %d , A chave eh : %s\n", meu_rank,chave);
 				
-					
 				//RECEBENDO O BLOCO
 				MPI_Recv(block,
 							block_tam+1,
@@ -251,9 +249,6 @@ int main(int argc,char** argv){
 							MPI_COMM_WORLD,
 							&status);
 
-				printf("Meu Rank eh : %d , Meu bloco eh : %s\n", meu_rank,block);
-
-				
 
 				/*
 				Observe que se nossa chave_tam=4 e o block_tam = 9, testaremos pela chave, (block_tam - chav_tam)+1. No exemplo eh 6
@@ -271,7 +266,7 @@ int main(int argc,char** argv){
 
 				int key_total=checkForKey(block,chave,block_tam,chave_tam);
 				
-				printf("Meu Rank eh : %d, o total de chaves q achei foi : %d\n",meu_rank,key_total);
+				printf("Meu Rank eh : %d,Meu bloco eh : %s, o total de chaves q achei foi : %d\n",meu_rank,block,key_total);
 
 				//Aqui tem que fazer o REDULCE, pro 0 receber tudo
 			}
