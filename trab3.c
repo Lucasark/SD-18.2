@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include "mpi.h"
 
+#define MAXQTT 100
+#define MAXSIZ 1000
+#define BLKSIZ 600
 
 int checkForKey(char block[],char chave[],int block_tam,int chave_tam){
 	int total=0;
@@ -62,56 +65,159 @@ int main(int argc,char** argv){
 	int genes_tam=0;		//TOdos podem iniciar essas duas
 	int chave_tam=0;
 
-	/*
-	Aqui embaixo (no if abaixo) prepararemos 3 arrays
-	char genes_list[][] 	Contendo todos os genes a nalizados
-	char genes_names[][]	Os nomes qeu acompanham as sequencias de genes (ja que temos que escreve-las no arquivo out)
-	char chave_list[][]		Contendo a lista das chaves	
-	*/
-	//char genes_list[][];
-	//char genes_names[][];
-	//char chave_list[][];
+	int qtt_genes, qtt_chaves;
+	char **genes_names, **genes_list, **chaves_list;
 
-	if(meu_rank==0){
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////ROTINA DE PREPARO////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+	if(meu_rank==0){	
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////// L E I T U R A   D E   A R Q U I V O //////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		FILE *fp;
+		char buff[MAXSIZ], endc = 0;
+		int i = 0, n = -1, tam = 0;
+		fp = fopen("dna.in", "r");
+
+		genes_names = (char**) malloc(MAXQTT * sizeof(char *));
+		genes_list = (char**) malloc(MAXQTT * sizeof(char *));
+		chaves_list = (char**) malloc(MAXQTT * sizeof(char *));
+
+
+
+		//capta o primeiro caracter para manter os nomes uniformes (sem o > antes)
+		endc = fgetc(fp);
+		while (endc != EOF){
+			n++;
+			genes_names[n] = (char*) malloc(MAXSIZ);
+			genes_list[n] = (char*) malloc(MAXSIZ);
+			
+			fgets(genes_names[n], MAXSIZ, (FILE*)fp);
+			//printf("Nome : %s\nGene : ", genes_names[n]);
+			
+			for(i; i < MAXSIZ;i++){
+				
+				genes_list[n][i] = fgetc(fp);
+				//printf("%c", genes_list[n][i] );
+				if(genes_list[n][i]=='\n' || genes_list[n][i] == EOF){
+					genes_list[n][i] = '\0'; //Caracter terminal da string do gene
+					break;
+				}
+			}
+			i = 0;
+			endc = fgetc(fp);
+		}
+		qtt_genes = n+1;
+		fp = fopen("query.in", "r");
+
+		endc = fgetc(fp);
+		n = -1;
+
+		while (endc != EOF){
+			n++;
+			chaves_list[n] = (char*) malloc(MAXSIZ);
+			
+			fgets(chaves_list[n], MAXSIZ, (FILE*)fp);
+			//printf("Nome : %sGene : ", chaves_list[n]);
+			
+			for(i; i < MAXSIZ;i++){
+				
+				chaves_list[n][i] = fgetc(fp);
+				//printf("%c", chaves_list[n][i] );
+				if(chaves_list[n][i]=='\n' || chaves_list[n][i] == EOF){
+					chaves_list[n][i] = '\0'; //Caracter terminal da string do gene
+					break;
+				}
+			}
+			i = 0;
+			endc = fgetc(fp);
+		}
+		qtt_chaves = n+1;
+
+		fclose(fp);
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		for (to = 1; i <= nt; ++i)
+		{
+			MPI_Send(&qtt_genes,
+					1,
+					MPI_INT,
+					to,
+					tag,
+					MPI_COMM_WORLD);
+
+			MPI_Send(&qtt_chaves,
+						1,
+						MPI_INT,
+						to,
+						tag,
+						MPI_COMM_WORLD);
+		}
+
+	}else{
+
+		MPI_Recv(&qtt_genes,
+							1,
+							MPI_INT,
+							0,
+							tag,
+							MPI_COMM_WORLD,
+							&status);
+
+		//printf("\nMeu Rank eh : %d e eu recebi: %d genes\n",meu_rank,qtt_genes);
+
+		MPI_Recv(&qtt_chaves,
+							1,
+							MPI_INT,
+							0,
+							tag,
+							MPI_COMM_WORLD,
+							&status);
+		//printf("\n\nMeu Rank eh : %d e eu recebi: %d chaves\n",meu_rank,qtt_chaves);
 	}
 
-	/*
-	TUDO MARCADO COM <== talvez possa deixar de ser c omentario,eh soh para dar a ideia de como passariamos por todos
-	os genes e todas as chaves, 
-	*/
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//char chave[];																								<==   
-	//char genes[];																								<==
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////ROTINA PRINCIPAL////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//int n_genes;	//tem o numero de genes que veio no arquivo													<==
-	//int n_keys;		//tem o numero de keys que vieram no arquivo											<==
+	if(meu_rank==0)printf("terminou preparo com sucesso\n");
 
-	//int genes_ctrl;	//dizer qual gene esta sendo analizado no momento,um Indice								<==
-	//int chave_ctrl;	//dizer qual chave esta sendo utilizada no momento, um Indice							<==
+	int genes_ctrl,chave_ctrl;
 
-	//for (genes_ctrl = 0; genes_ctrl < n_genes; ++genes_ctrl){													<==
+	char *genes = (char*) malloc(MAXSIZ); //Todos os ranks vao alocar isso,entao tem que desalocar
+	char *chave = (char*) malloc(MAXSIZ);
 
-	//	if(meu_rank==0)genes=genes_list[genes_ctrl]; //soh o processo 0 tem acesso a essas informacoes;			<==
+	for (genes_ctrl = 0; genes_ctrl < qtt_genes; ++genes_ctrl){		// aqui sao 2 for`s para percorrer todas as combinacoes de genes
+																	// com suas respectivas chaves	
 
-	//	for (key_ctrl = 0; key_ctrl < n_keys; ++key_ctrl){														<==
+		if(meu_rank==0){//soh o processo 0 tem acesso a essas informacoes;		
+			genes=genes_list[genes_ctrl]; 
+		}	
+
+		for (chave_ctrl = 0; chave_ctrl < qtt_chaves; ++chave_ctrl){														
 
 			if(meu_rank==0){
 
-				//chave=chave_list[chave_ctrl];			<==
+				chave=chaves_list[chave_ctrl];			
 
-				char chave[] = "ABC";
-				char genes[] = "FODAABCSSEERTABC3EFABCABCAHEABCHEHUAHUAABCABC";
-
-				genes_tam = sizeof(genes)/sizeof(char)-1;		//CUidado com esse -1 ele eh para passarmos sem contar o \0
-				chave_tam = sizeof(chave)/sizeof(char)-1;
+				genes_tam = strlen(genes);		//CUidado com esse -1 ele eh para passarmos sem contar o \0
+				chave_tam = strlen(chave);
 
 				orig_tam = genes_tam / nt;						 //dividindo a sequencia genetica entre os processos,sem o overlay
 				resto = genes_tam % nt; 						//de fato soh pegando o quanto vai restar da divisao.
 				block_tam = orig_tam + (chave_tam-1);			//total que serah recebido por casa processo
 
-				char block[1000];		//criando espaco para enviar os genes necessarios
-
+				char * block = (char*) malloc(BLKSIZ);	//criando espaco para enviar os genes necessarios (Unico do rank 0)
+				printf("\nflag 1\n");
 				int init_index=0;
 				for (to = 1; to < nt; to++){//agora enviaremos para cada processo a chave,enviarah a parte necessaria da string de genes, o resto eh deduzivel  (menos mensagem)
 
@@ -150,7 +256,7 @@ int main(int argc,char** argv){
 
 					init_index += orig_tam;		//update de onde comeca os "genes" que serao enviados
 				} 
-
+				printf("\nflag 2\n");
 				//aqui eh o envio apenas para o ultimo processo
 				//obs perceba que o ultimo eh nt, pois se tivessemos 6 processos,np=6 ,nt=5, e os processos sao 0,1,2,3,4,5. OU seja nt eh o ultimo
 
@@ -191,16 +297,13 @@ int main(int argc,char** argv){
 							tag,
 							MPI_COMM_WORLD);
 
-
-
-
-
-
 				/*
 				AQUI PREPARAR O 0 PARA RECEER O REDULCE
 				*/
 
 
+				printf("\nflag 3\n");
+				//free(block);// FAZER ISSO PRO ULTIMO tirar comentario quando redulce for implementado
 			}else{
 
 
@@ -217,8 +320,6 @@ int main(int argc,char** argv){
 							&status);
 				
 				//RECEBE TAMANHO DO BLOCO A SER PROCESSADO
-
-
 				MPI_Recv(&block_tam,
 							1,
 							MPI_INT,
@@ -227,13 +328,13 @@ int main(int argc,char** argv){
 							MPI_COMM_WORLD,
 							&status);
 
-				char chave[chave_tam+1];
+				char chave_copy[chave_tam+2]; //EM teoria eles ja tem um treco de nome chave alocado,soh que bem maior
 
-				char block[block_tam+1];
+				char block[block_tam+2];//coloquei  +2 soh pra coisas de \0
 
 				//RECEBENDO A CHAVE
-				MPI_Recv(chave,
-							chave_tam+1,
+				MPI_Recv(chave_copy,
+							chave_tam+2,
 							MPI_CHAR,
 							0,
 							tag,
@@ -266,12 +367,42 @@ int main(int argc,char** argv){
 
 				int key_total=checkForKey(block,chave,block_tam,chave_tam);
 				
-				printf("Meu Rank eh : %d,Meu bloco eh : %s, o total de chaves q achei foi : %d\n",meu_rank,block,key_total);
+				//printf("Meu Rank eh : %d,Meu bloco eh : %s, o total de chaves q achei foi : %d\n",meu_rank,block,key_total);
 
 				//Aqui tem que fazer o REDULCE, pro 0 receber tudo
+
+
+
+
+
+				//free(block); // FAZER ISSO PRO ULTIMO tirar comentario quando redulce for implementado
 			}
-//		}					<==
-//	}						<==
-		
+		}					
+	}						
+	
+
+
+
+	printf("\nDUVIDO\n");
+	//Limpeza//
+
+	if(meu_rank==0){
+
+		int clr = 0;
+
+		for(clr; clr < qtt_genes; clr++){
+			free(genes_names[clr]);
+			free(genes_list[clr]);
+		}
+		free(genes_names);
+		free(genes_list);
+		free(chaves_list);
+	}
+
+	free(chave);
+	free(genes);
+
+	MPI_Finalize();
+
 	return 0;
 }
