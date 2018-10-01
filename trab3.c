@@ -65,8 +65,20 @@ int main(int argc,char** argv){
 	int genes_tam=0;		//TOdos podem iniciar essas duas
 	int chave_tam=0;
 
+	int key_total_local=0;
+	int key_total=69;
+
 	int qtt_genes, qtt_chaves;
 	char **genes_names, **genes_list, **chaves_list;
+	FILE *fout;
+	int **totais= (int**)malloc(MAXQTT*sizeof(int*));
+	int x,y;
+	for (x = 0; x < MAXQTT; ++x){
+		totais[x]= (int*)malloc(MAXQTT*sizeof(int));
+		for (y = 0; y < MAXQTT; ++y){
+			totais[x][y]=0;
+		}
+	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////ROTINA DE PREPARO////////////////////////////////////////////////////////////////////////////////////////
@@ -81,6 +93,7 @@ int main(int argc,char** argv){
 		char buff[MAXSIZ], endc = 0;
 		int i = 0, n = -1, tam = 0;
 		fp = fopen("dna.in", "r");
+		fout = fopen("dna.out", "w");
 
 		genes_names = (char**) malloc(MAXQTT * sizeof(char *));
 		genes_list = (char**) malloc(MAXQTT * sizeof(char *));
@@ -110,7 +123,7 @@ int main(int argc,char** argv){
 			i = 0;
 			endc = fgetc(fp);
 		}
-		qtt_genes = n+1;
+		qtt_genes = n;							//SE ROLAR PROBLEMA SOMAR 1
 		fp = fopen("query.in", "r");
 
 		endc = fgetc(fp);
@@ -142,30 +155,29 @@ int main(int argc,char** argv){
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		for (to = 1; i <= nt; ++i)
+		for (to = 1; to <= nt; ++to)
 		{
 			MPI_Send(&qtt_genes,
 					1,
 					MPI_INT,
 					to,
-					tag,
+					9,
 					MPI_COMM_WORLD);
 
 			MPI_Send(&qtt_chaves,
 						1,
 						MPI_INT,
 						to,
-						tag,
+						8,
 						MPI_COMM_WORLD);
 		}
-
 	}else{
 
 		MPI_Recv(&qtt_genes,
 							1,
 							MPI_INT,
 							0,
-							tag,
+							9,
 							MPI_COMM_WORLD,
 							&status);
 
@@ -175,7 +187,7 @@ int main(int argc,char** argv){
 							1,
 							MPI_INT,
 							0,
-							tag,
+							8,
 							MPI_COMM_WORLD,
 							&status);
 		//printf("\n\nMeu Rank eh : %d e eu recebi: %d chaves\n",meu_rank,qtt_chaves);
@@ -188,8 +200,6 @@ int main(int argc,char** argv){
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////ROTINA PRINCIPAL////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	if(meu_rank==0)printf("terminou preparo com sucesso\n");
 
 	int genes_ctrl,chave_ctrl;
 
@@ -217,7 +227,7 @@ int main(int argc,char** argv){
 				block_tam = orig_tam + (chave_tam-1);			//total que serah recebido por casa processo
 
 				char * block = (char*) malloc(BLKSIZ);	//criando espaco para enviar os genes necessarios (Unico do rank 0)
-				printf("\nflag 1\n");
+				
 				int init_index=0;
 				for (to = 1; to < nt; to++){//agora enviaremos para cada processo a chave,enviarah a parte necessaria da string de genes, o resto eh deduzivel  (menos mensagem)
 
@@ -229,34 +239,37 @@ int main(int argc,char** argv){
 								1,
 								MPI_INT,
 								to,
-								tag,
+								1,
 								MPI_COMM_WORLD);
 
 					MPI_Send(&block_tam,
 								1,  //ja equivale a strlen(block)+1,fica menos processamento
 								MPI_INT,
 								to,
-								tag,
+								2,
 								MPI_COMM_WORLD);	
+
+					//printf("\nO tamanho da chave eh %d bits | O tamanho do bloco eh %d bits\n", (int) sizeof(chave_tam), (int) sizeof(block_tam));
+
+					//printf("Chave_tam : %d | Bloco_tam : %d | Chave : %s | Bloco %s \n",chave_tam,block_tam,chave,block);
 
 					MPI_Send(chave,
 								chave_tam+1,  //ja equivale a strlen(block)+1,fica menos processamento
 								MPI_CHAR,
 								to,
-								tag,
+								3,
 								MPI_COMM_WORLD);
 
 					MPI_Send(block,
 								block_tam+1,  //ja equivale a strlen(block)+1,fica menos processamento
 								MPI_CHAR,
 								to,
-								tag,
+								4,
 								MPI_COMM_WORLD);
-
 
 					init_index += orig_tam;		//update de onde comeca os "genes" que serao enviados
 				} 
-				printf("\nflag 2\n");
+				
 				//aqui eh o envio apenas para o ultimo processo
 				//obs perceba que o ultimo eh nt, pois se tivessemos 6 processos,np=6 ,nt=5, e os processos sao 0,1,2,3,4,5. OU seja nt eh o ultimo
 
@@ -266,47 +279,53 @@ int main(int argc,char** argv){
 
 				cutstr(block,genes,block_tam,genes_tam,init_index);
 
-				//strncpy(block,genes + init_index, block_tam);  //fazendo o mesmo processo de antes mas a quantidade que eh pega eh menor (ou igual),relativo ao resto que der da divisao
-
-
 				MPI_Send(&chave_tam,
 					 		1,
 						 	MPI_INT,
 						 	to,
-						 	tag,
+						 	1,
 						 	MPI_COMM_WORLD);
 
 				MPI_Send(&block_tam,
 							1,
 							MPI_INT,
 							to,
-							tag,
+							2,
 							MPI_COMM_WORLD);	
+
+				//printf("Chave_tam : %d | Bloco_tam : %d | Chave : %s | Bloco %s \n",chave_tam,block_tam,chave,block);
 
 				MPI_Send(chave,
 							chave_tam+1,  //ja equivale a strlen(chave)+1,fica menos processamento
 							MPI_CHAR,
 							to,
-							tag,
+							3,
 							MPI_COMM_WORLD);
 
 				MPI_Send(block,
 							block_tam+1,  //ja equivale a strlen(block)+1,fica menos processamento
 							MPI_CHAR,
 							to,
-							tag,
+							4,
 							MPI_COMM_WORLD);
 
-				/*
-				AQUI PREPARAR O 0 PARA RECEER O REDULCE
-				*/
+
+				//MPI_Reduce(&key_total_local, &key_total, 1, MPI_INT, MPI_SUM, 0,MPI_COMM_WORLD);
+				
+				MPI_Barrier(MPI_COMM_WORLD);
 
 
-				printf("\nflag 3\n");
-				//free(block);// FAZER ISSO PRO ULTIMO tirar comentario quando redulce for implementado
+				//////////////////////////////////////////////////////////////////////////////////////
+				////////////////////////////////////REDUCE////////////////////////////////////////////
+				//////////////////////////////////////////////////////////////////////////////////////
+				totais[genes_ctrl][chave_ctrl]=chave_ctrl+genes_ctrl;
+
+
+				free(block);// FAZER ISSO PRO ULTIMO tirar comentario quando redulce for implementado
+
 			}else{
-
-
+				
+				
 				//MPI_receive
 				
 
@@ -315,7 +334,7 @@ int main(int argc,char** argv){
 							1,
 							MPI_INT,
 							0,
-							tag,
+							1,
 							MPI_COMM_WORLD,
 							&status);
 				
@@ -324,36 +343,38 @@ int main(int argc,char** argv){
 							1,
 							MPI_INT,
 							0,
-							tag,
+							2,
 							MPI_COMM_WORLD,
 							&status);
 
-				char chave_copy[chave_tam+2]; //EM teoria eles ja tem um treco de nome chave alocado,soh que bem maior
+				char *chave_copy=(char*)malloc(chave_tam+2); //EM teoria eles ja tem um treco de nome chave alocado,soh que bem maior
 
-				char block[block_tam+2];//coloquei  +2 soh pra coisas de \0
+				char *block_copy=(char*)malloc(block_tam+2);//coloquei  +2 soh pra coisas de \0
 
 				//RECEBENDO A CHAVE
 				MPI_Recv(chave_copy,
 							chave_tam+2,
 							MPI_CHAR,
 							0,
-							tag,
+							3,
 							MPI_COMM_WORLD,
 							&status);
 				
 				//RECEBENDO O BLOCO
-				MPI_Recv(block,
-							block_tam+1,
+				MPI_Recv(block_copy,
+							block_tam+2,
 							MPI_CHAR,
 							0,
-							tag,
+							4,
 							MPI_COMM_WORLD,
 							&status);
 
 
+				//printf("\n Sou : %d | chave tamanho : %d | block tamanho : %d \n Chave : %s | Bloco : %s \n ",meu_rank,chave_tam,block_tam,chave_copy,block_copy);
+				
 				/*
 				Observe que se nossa chave_tam=4 e o block_tam = 9, testaremos pela chave, (block_tam - chav_tam)+1. No exemplo eh 6
-				Oque equivale ateh para o ultimo processo (ele apenas teria um blocktam menor). Veja o exemplo:
+				Oque equivale ateh para o ultimo processo (ele apenas teria um block_tam menor). Veja o exemplo:
 
 				ABCDEFGHI: 
 
@@ -365,25 +386,52 @@ int main(int argc,char** argv){
 				Teste 6 = FGHI
 				*/
 
-				int key_total=checkForKey(block,chave,block_tam,chave_tam);
+
+				key_total_local=checkForKey(block_copy,chave_copy,block_tam,chave_tam);
 				
-				//printf("Meu Rank eh : %d,Meu bloco eh : %s, o total de chaves q achei foi : %d\n",meu_rank,block,key_total);
+				printf("\n Gene : %d | Key : %d  Rank : %d | Bloco : %s, Chave : %s | O total de chaves q achei foi : %d\n",genes_ctrl,chave_ctrl,meu_rank,block_copy,chave_copy,key_total_local);
+	
+				MPI_Barrier(MPI_COMM_WORLD);
 
-				//Aqui tem que fazer o REDULCE, pro 0 receber tudo
+				free(chave_copy);
+				free(block_copy);
 
+				//MPI_Reduce(&key_total_local, &key_total, 1, MPI_INT, MPI_SUM, 0,MPI_COMM_WORLD);
 
-
-
-
-				//free(block); // FAZER ISSO PRO ULTIMO tirar comentario quando redulce for implementado
+				
 			}
 		}					
 	}						
 	
+	if(meu_rank==0){
+		chave_ctrl=0;
+		genes_ctrl=0;
+		int sem_resultado=1;
 
 
+		for (chave_ctrl = 0; chave_ctrl < qtt_chaves; ++chave_ctrl){
 
-	printf("\nDUVIDO\n");
+			fprintf(fout, ">Query string #%d\n",chave_ctrl+1);
+
+			for (genes_ctrl = 0; genes_ctrl < qtt_genes; ++genes_ctrl){
+
+				 if(totais[genes_ctrl][chave_ctrl]){
+				 		sem_resultado=0;
+				 		fprintf(fout, ">%s",genes_names[genes_ctrl]);
+						fprintf(fout, "%d\n", totais[genes_ctrl][chave_ctrl]);
+					}
+			}
+
+			if(sem_resultado){
+				fprintf(fout, "NOT FOUND\n");
+				sem_resultado=1;
+			}
+		}
+
+		fclose(fout);
+	}
+
+
 	//Limpeza//
 
 	if(meu_rank==0){
