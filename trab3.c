@@ -7,7 +7,8 @@
 #define MAXSIZ 1000
 #define BLKSIZ 600
 
-int checkForKey(char block[],char chave[],int block_tam,int chave_tam){
+int checkForKey(char block[],char chave[],int block_tam,int chave_tam,int* lugar){
+	int achado = 0;
 	int total=0;
 	int check_ini; 		//"Ponteiro" dizendo onde ta comecando a parte que estamos analizando no bloco
 	int j;				//ponteiro que controla UMA interacao de checagem da chave
@@ -23,7 +24,14 @@ int checkForKey(char block[],char chave[],int block_tam,int chave_tam){
 		{	
 			k_index++;
 			if(j==(end-1)){ 
-				if(block[j]==chave[k_index])total++; //se chegou aqui entao tem a chave dentro do bloco,portanto almentamos o total
+				if(block[j]==chave[k_index]){
+					if(!achado){
+						*lugar = check_ini+j;   //se nunca tiver achado salva o lugar (pq serah a primeira)
+												//check_ini+j pois eh quanto andamos com o inicio e quanto andamos dai em diante
+					}
+					achado=1;
+					total++; //se chegou aqui entao tem a chave dentro do bloco,portanto almentamos o total
+				}
 			}
 			if(block[j]!=chave[k_index])break;		//caso qualquer caracter esteja errado da break do for.
 		}
@@ -68,15 +76,21 @@ int main(int argc,char** argv){
 	int key_total_local=0;
 	int key_total=69;
 
+
 	int qtt_genes, qtt_chaves;
 	char **genes_names, **genes_list, **chaves_list;
 	FILE *fout;
+
+	int **lugares=(int**)malloc(MAXQTT*sizeof(int*));
+
 	int **totais= (int**)malloc(MAXQTT*sizeof(int*));
 	int x,y;
 	for (x = 0; x < MAXQTT; ++x){
 		totais[x]= (int*)malloc(MAXQTT*sizeof(int));
+		lugares[x]= (int*)malloc(MAXQTT*sizeof(int));
 		for (y = 0; y < MAXQTT; ++y){
 			totais[x][y]=0;
+			lugares[x][y]=0;
 		}
 	}
 
@@ -319,8 +333,12 @@ int main(int argc,char** argv){
 				////////////////////////////////////SOMANDO////////////////////////////////////////////
 				//////////////////////////////////////////////////////////////////////////////////////
 				int total_chave=0;
-				for (x = 1; x <= nt; ++x)
-				{
+				int primeiro_lugar=1000000;
+				int temp_lugar;
+				int lugar_real;
+
+				for (x = 1; x <= nt; ++x){
+
 					MPI_Recv(&key_total_local,
 							1,
 							MPI_INT,
@@ -329,9 +347,33 @@ int main(int argc,char** argv){
 							MPI_COMM_WORLD,
 							&status);
 
+					MPI_Recv(&temp_lugar,
+							1,
+							MPI_INT,
+							x,
+							11,
+							MPI_COMM_WORLD,
+							&status);
+
+					///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					////////////////////////////////////////////////////MUDANCA////////////////////////////////////////////////////////////////////////
+					if(key_total_local){// se tiver pelo menos uma aparicao
+
+						lugar_real=temp_lugar+((x-1)*orig_tam); //saber onde exatamente foi encontrado(POIS EH RELATIVO A ORIGIN_TAM)
+						
+						if(lugar_real < primeiro_lugar){
+
+							primeiro_lugar=lugar_real;  //atualiza temporariamente
+
+							printf("Bloco : %d | lugar_real : %d | orig_tam : %d | temp_lugar : %d \n",x,lugar_real,orig_tam,temp_lugar);
+						}
+					}
+					///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					////////////////////////////////////////////////////MUDANCA////////////////////////////////////////////////////////////////////////
 					total_chave+=key_total_local;
 				}
 
+				lugares[genes_ctrl][chave_ctrl]=primeiro_lugar;
 				totais[genes_ctrl][chave_ctrl]=total_chave;
 
 				//////////////////////////////////////////////////////////////////////////////////////
@@ -340,7 +382,6 @@ int main(int argc,char** argv){
 
 
 				free(block);// FAZER ISSO PRO ULTIMO tirar comentario quando redulce for implementado
-
 			}else{
 				
 				
@@ -403,9 +444,9 @@ int main(int argc,char** argv){
 				Teste 5 = EFGH
 				Teste 6 = FGHI
 				*/
+				int lugar=0;
 
-
-				key_total_local=checkForKey(block_copy,chave_copy,block_tam,chave_tam);
+				key_total_local=checkForKey(block_copy,chave_copy,block_tam,chave_tam,&lugar);
 				
 				//printf("\n Gene : %d | Key : %d  Rank : %d | Bloco : %s, Chave : %s | O total de chaves q achei foi : %d\n",genes_ctrl,chave_ctrl,meu_rank,block_copy,chave_copy,key_total_local);
 	
@@ -415,16 +456,24 @@ int main(int argc,char** argv){
 				free(block_copy);
 
 				MPI_Send(&key_total_local,
-							1,  //ja equivale a strlen(block)+1,fica menos processamento
+							1, 
 							MPI_INT,
 							0,
 							10,
-							MPI_COMM_WORLD);	
-				
+							MPI_COMM_WORLD);
+
+
+				MPI_Send(&lugar,
+							1,  
+							MPI_INT,
+							0,
+							11,
+							MPI_COMM_WORLD);
 			}
-		}					
-	}						
-	
+		}
+	}	
+
+
 	if(meu_rank==0){
 		chave_ctrl=0;
 		genes_ctrl=0;
@@ -442,7 +491,7 @@ int main(int argc,char** argv){
 				 if(totais[genes_ctrl][chave_ctrl]){
 				 		sem_resultado=0;
 				 		fprintf(fout, ">%s",genes_names[genes_ctrl]);
-						fprintf(fout, "%d\n", totais[genes_ctrl][chave_ctrl]);
+						fprintf(fout, "Total de Ocorrencias : %d , Primeira ocorrencia : %d\n", totais[genes_ctrl][chave_ctrl], lugares[genes_ctrl][chave_ctrl]);
 					}
 			}
 
@@ -472,8 +521,10 @@ int main(int argc,char** argv){
 
 		for (x = 0; x < MAXQTT; ++x){
 			free(totais[x]);
+			free(lugares[x]);
 		}
 		free(totais);
+		free(lugares);
 	}
 
 	free(chave);
