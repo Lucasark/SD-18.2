@@ -316,9 +316,27 @@ int main(int argc,char** argv){
 
 
 				//////////////////////////////////////////////////////////////////////////////////////
-				////////////////////////////////////REDUCE////////////////////////////////////////////
+				////////////////////////////////////SOMANDO////////////////////////////////////////////
 				//////////////////////////////////////////////////////////////////////////////////////
-				totais[genes_ctrl][chave_ctrl]=chave_ctrl+genes_ctrl;
+				int total_chave=0;
+				for (x = 1; x <= nt; ++x)
+				{
+					MPI_Recv(&key_total_local,
+							1,
+							MPI_INT,
+							x,
+							10,
+							MPI_COMM_WORLD,
+							&status);
+
+					total_chave+=key_total_local;
+				}
+
+				totais[genes_ctrl][chave_ctrl]=total_chave;
+
+				//////////////////////////////////////////////////////////////////////////////////////
+				//////////////////////////////////////////////////////////////////////////////////////
+				//////////////////////////////////////////////////////////////////////////////////////
 
 
 				free(block);// FAZER ISSO PRO ULTIMO tirar comentario quando redulce for implementado
@@ -389,15 +407,19 @@ int main(int argc,char** argv){
 
 				key_total_local=checkForKey(block_copy,chave_copy,block_tam,chave_tam);
 				
-				printf("\n Gene : %d | Key : %d  Rank : %d | Bloco : %s, Chave : %s | O total de chaves q achei foi : %d\n",genes_ctrl,chave_ctrl,meu_rank,block_copy,chave_copy,key_total_local);
+				//printf("\n Gene : %d | Key : %d  Rank : %d | Bloco : %s, Chave : %s | O total de chaves q achei foi : %d\n",genes_ctrl,chave_ctrl,meu_rank,block_copy,chave_copy,key_total_local);
 	
 				MPI_Barrier(MPI_COMM_WORLD);
 
 				free(chave_copy);
 				free(block_copy);
 
-				//MPI_Reduce(&key_total_local, &key_total, 1, MPI_INT, MPI_SUM, 0,MPI_COMM_WORLD);
-
+				MPI_Send(&key_total_local,
+							1,  //ja equivale a strlen(block)+1,fica menos processamento
+							MPI_INT,
+							0,
+							10,
+							MPI_COMM_WORLD);	
 				
 			}
 		}					
@@ -410,6 +432,8 @@ int main(int argc,char** argv){
 
 
 		for (chave_ctrl = 0; chave_ctrl < qtt_chaves; ++chave_ctrl){
+			
+			sem_resultado=1;
 
 			fprintf(fout, ">Query string #%d\n",chave_ctrl+1);
 
@@ -445,6 +469,11 @@ int main(int argc,char** argv){
 		free(genes_names);
 		free(genes_list);
 		free(chaves_list);
+
+		for (x = 0; x < MAXQTT; ++x){
+			free(totais[x]);
+		}
+		free(totais);
 	}
 
 	free(chave);
