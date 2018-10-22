@@ -73,7 +73,7 @@ public class Servidor implements Interface {
 
 		count++;
 
-		Thread.sleep(5000);
+		Thread.sleep(3000);
 
 		return resposta;
 

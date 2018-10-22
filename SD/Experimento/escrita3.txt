@@ -4,3 +4,12 @@ Oi eu sou o cliente 5 e quero escrever: INPUT
 Oi eu sou o cliente 7 e quero escrever: INPUT
 Oi eu sou o cliente 9 e quero escrever: INPUT
 Oi eu sou o cliente 15 e quero escrever: INPUT
+Oi eu sou o cliente 6 e quero escrever: INPUT
+Oi eu sou o cliente 9 e quero escrever: INPUT
+Oi eu sou o cliente 3 e quero escrever: INPUT
+Oi eu sou o cliente 4 e quero escrever: INPUT
+Oi eu sou o cliente 5 e quero escrever: INPUT
+Oi eu sou o cliente 14 e quero escrever: INPUT
+Oi eu sou o cliente 18 e quero escrever: INPUT
+Oi eu sou o cliente 23 e quero escrever: INPUT
+Oi eu sou o cliente 29 e quero escrever: INPUT
