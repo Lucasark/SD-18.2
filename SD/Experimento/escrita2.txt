@@ -1,0 +1,5 @@
+Oi eu sou o cliente 4 e quero escrever: INPUT
+Oi eu sou o cliente 10 e quero escrever: INPUT
+Oi eu sou o cliente 12 e quero escrever: INPUT
+Oi eu sou o cliente 16 e quero escrever: INPUT
+Oi eu sou o cliente 20 e quero escrever: INPUT

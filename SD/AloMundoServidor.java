@@ -22,7 +22,7 @@ public class AloMundoServidor implements AloMundo {
 		}
 		lock = true;
 		*/
-		File file = new File("C:\\Users\\Daniel\\Documents\\Facul\\SD\\SD-18.2-master\\SD\\test.txt"); 
+		File file = new File("test.txt"); 
 		
 		BufferedReader reader = new BufferedReader(new FileReader(file)); 
 

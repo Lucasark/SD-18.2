@@ -1,0 +1,122 @@
+Quests ativas_ {
+
+ 
+ 
+Quests possíveis_ {
+
+	Bloodhunted {
+		Ciganisse Ciganal é um grupo de artistas circenses de etnia --- 
+	}
+	
+ 
+} 
+ 
+Quests completadas_ {
+	
+	Ruínas e Kobolds_ {
+	O grupo vai até as ruínas da antiga Aligor e encontra restos de um ritual comandado por um Kobold alado. Eles derrotam o kobold e recolhem os restos do que parece ser uma relíquia feita de pequenos prismas.
+	}
+	
+	Sob Verana_ {
+	Na cidade de Verana parece que há um grupo de pessoas do alto escalão querendo controlar a cidade e limpá-la de certos comerciantes. Um clima de tensão cobre a cidade enquanto homens com armaduras cinza patrulham as ruas e ficam em cima daqueles que não cumprem suas regras. 
+		O que saber_ 
+		• Homens de cinza ameaçando comerciantes
+		• Preconceito com pessaos de fora
+		• Militares envolvidos
+	Eventos importantes:
+		• Soldado Sebastião se suicidou no dia de sua chegada à Verana. Ao investigar a casa:
+			• Seu corpo não está mais lá. No chão é possível ver uma poça pequena de sangue e 3 frascos vazios perto de uma caneca e uma garrafa caída de Black Frog.
+			• (Medicine/Kit de Herbalismo ou Alquemia 'Int' 10) Os frascos continham veneno e o sangue está escuro demais.
+			• (Investigation 15) Em seu quarto podem ser encontrados documentos vindos da cidade falando para que os guardas evitassem contato com os Kobolds e deixassem eles em paz em qualquer situação. As cartas são endereçadas por C.. 45 PO. Também há cartas de sua família, endereçadas de Strada.
+			• (Investigation 20) 200 PO, 3 Jóias de 25 PO (2 anéis, 1 braçadeira)
+		
+	P.o.I.:
+	Adel Imad'_
+		• Sabe que os bandidos de cinza não gostam de estrangeiros.
+		• É aliado de Anastasia e Barter Amberhart 'Forja Dourada' e Elias de Leng e Yaweh 'Canto Espiral'
+		• 
+	Carter Amberhart_
+		• Sabe sobre o suicídio do militar e onde ele vive. Sabe também que a casa está protegida, mas não sabe exatamente quantos guardas.
+		• Desconfia que, por causa da proteção na casa, a própria guarda da cidade fez aquilo.
+		• Sabe que os homens de cinza normalmente se encontram na taverna Black Frog e que talvez o taverneiro saiba de algo sobre eles.
+		• (Persuasion 20) Empresta Boots of Elvenkind para o grupo se pedirem ajuda. Diz que precisa delas de volta.
+		• (Persuasion 25) Comenta sobre ser um ex membro da thieves guild.
+	Elias de Leng e Yaweh_
+		• Não estão interessados em nada disso.
+		• Avisam que se o problema piorar, eles vão apenas levar sua loja para outro lugar, sem problemas.
+		• Diz que os soldados os temem, mas arrumam qualquer desculpa para ferrar com seus negócios à distância. 
+		• Sabem que o capitão está envolvido com coisas que não devia.
+		• Sabem sobre o Culto às Profundezas e acreditam que o grupo não existe mais, mas que outros com objetivos semelhantes podem estar em ação.
+		• "Sempre haverão loucos por aí que cultuam o fim dos tempos. Que aceitam propostas de poder que vem a qualquer custo. O chefe da guarda é apenas mais um deles, a mando de outros que pensam da mesma forma. As forças das profundezas são terríveis demais para serem contidas por mãos de efêmeros."
+		
+	Qualquer bandido cinzento_
+		• (Intimidate 13) Revela a localização do esconderijo.
+		• (Intimidate 18) Revela que o líder é o Ente de Poeira.
+	Ente de Poeira (Sarud Duststorm)_
+		• Não revelará nenhuma informação antes de combate e irá tentar paz/fugir quando em 30% de vida.
+		• Não entra em combate caso esteja sozinho.
+		• (Intimidate/Persuasion 15) Está disposto a revelar que seu mandante é o Capitão Dullock e que o objetivo dele é atrapalhar a vida dos estrangeiros. Sabe que ele também tem ideia das visitas que o Capitão recebeu de alguém misterioso e que não queria ter sua identidade revelada, mas decidiu não investigar.
+	
+	Edward's Household_
+		• Todo cômodo com pratarias pode ser looteado por 3d6pp (Investigation 10_*1; 15_*2; 20_*4) [ +1 em multiplicadores no quarto e na cozinha ]
+		• Pessoal:
+			Mordomo Ortiz_ 
+			Mordomo Ian_ 
+			Serviçal Amelia_ 
+			Serviçal Nora_ 
+			Serviçal Bruno_ Cabelos negros, olheiras, pele clara
+			Cozinheira Andaluz_ Cabelos loiros, olhos azuis cortantes e 30~ de idade aparente
+			
+			Edward Oliver se torna um monstro caso consiga chegar em seu círculo: https://www.dndbeyond.com/monsters/90657-shadow-elemental
+	
+	Ente de Poeira_ 87 de dano tomados {
+		Ver Master Thief (p.216 Volo's)
+		+
+		Voral's Exuvia
+		Wondrous Item, rare (requires attunement)
+		
+		• Voral's Exuvia has 4 charges, and regains 1d4 expended charges daily at dawn. 
+		• While doing a short rest, the wearer can try to channel dust and sand
+		through the mantle. Everytime the wearer expands hit dice to heal herself, she
+		can also roll a Wisdom check (DC 10 + remaining charges on Voral's Exuvia). If
+		she succeeds, the item regains 1d4 expended charges.
+		
+		• Sand Step (2 charges, 1 if in sand terrain): 
+		Instead of moving, the wearer's form collapses into loose sand 
+		and immediately reforms at another unoccupied space
+		within 10 feet. This movement doesn’t provoke
+		opportunity attacks. After using this trait in sand terrain,
+		the wearer can take a Hide action even if under direct
+		observation. The wearer can sand step under doors or
+		through similar obstacles, provided there’s a gap large
+		enough for sand to sift through.
+		
+		• Haboob (1/Day). The anubian creates a sandstorm that fills a
+		5-foot-radius, 30-foot-tall cylinder centered on itself. The area
+		is heavily obscured, and each creature other than an anubian
+		that enters the sandstorm or ends its turn there must make
+		a successful DC 13 Strength saving throw or be restrained
+		by it. Also, each creature other than an anubian that ends its
+		turn inside the sandstorm takes 3 (1d6) slashing damage. The
+		anubian can maintain the haboob for up to 10 minutes as if
+		concentrating on a spell. While maintaining the haboob, the
+		anubian’s speed is reduced to 5 feet and it can’t sand step.
+		Creatures restrained by the sandstorm move with the anubian.
+		A creature can free itself or an adjacent creature from the
+		sandstorm by using its action and making a DC 13 Strength
+		check. A successful check ends the restraint on the target
+		creature.
+		}
+	}
+}
+}
+
+Quests abandonadas_ {
+	 Black Frog {
+	 O dono ta taverna black frog está envenenando as pessoas com suas bebidas e as tornando viciadas, propensas a beber apenas sua cerveja.
+		O que saber_
+		• Ele está protegido pelos Homens de cinza
+		• Exite um "cura" para o vício. Pode ser curado por Restauração Menor ou qualquer magia superior ou pelo antídoto.
+		• Não é um efeito mágico.
+ }
+}Oi eu sou o cliente 0E quero escrever: INPUT
