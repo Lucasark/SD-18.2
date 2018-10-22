@@ -22,12 +22,14 @@ public class Servidor implements Interface {
 		this.blockingQueue = blockingQueueR;
 		this.executor = executorR;
 	}
-
-	public String lerArquivo() throws Exception {
-
+	
+	public String lerArquivo(String nomeArq) throws Exception {
+		
+		//substituir o parametro para nomeArq quando formos rodar mesmo
+		
 		System.out.println("Chamada de leitura do Cliente recebida! " + count);
 
-		String nomeArq = "leitura.txt";  // aqui podiamos pegar input
+		//String nomeArq = "leitura.txt";  // aqui podiamos pegar input
 
 		Callable<String> callable = new ThreadLeitura(blockingQueue,nomeArq);
 
@@ -47,17 +49,21 @@ public class Servidor implements Interface {
 
 		return resposta;
 	}
-
-	public String escreverArquivo() throws Exception {
-
+  
+	public String escreverArquivo(String nomeArq,String input) throws Exception {
+		
+		//substituir o parametro para nomeArq e input quando formos rodar mesmo
+		
 		System.out.println("Chamada de escrita do Cliente recebida! " + count);
 
+		/*
 		Random random = new Random();
         int arqNumb = random.nextInt((5 - 1) + 1) + 1;
 
 		String nomeArq = "escrita" + arqNumb + ".txt";  // aqui podiamos pegar input
-
+		
 		String input = "Oi eu sou o cliente " + count + " e quero escrever: INPUT"; // pegar input tambem
+		*/
 
 		Callable<String> callable = new ThreadEscrita(blockingQueue,nomeArq,input);
 
@@ -110,4 +116,5 @@ public class Servidor implements Interface {
 			}
 		}*/
 	}
+
 }
