@@ -5,14 +5,10 @@ import java.util.Scanner;
 public class Cliente {
 	private Cliente() {}
 	public static void main(String[] args) {
-		String host = (args.length < 1) ? null : args[0];
+		String host = null;
 		
-		Scanner in = new Scanner(System.in);
-		
-		System.out.println("Deseja Ler(L) ou Escrever(E)?\n L ou E ?");
-		String operacao = in.nextLine();
-		System.out.println("Qual o arquivo destino?");
-		String arqDestino = in.nextLine();
+		String operacao = args[0];
+		String arqDestino = args[1];
 		
 		try {
 				Registry registry = LocateRegistry.getRegistry(host);
@@ -22,8 +18,7 @@ public class Cliente {
 					resposta = stub.lerArquivo(arqDestino);
 					System.out.println("resposta: " + resposta);
 				}else if(operacao.equals("E") || operacao.equals("e")) {
-					System.out.println("O que qeur escrever?");
-					String input = in.nextLine();
+					String input = args[2];
 					resposta = stub.escreverArquivo(arqDestino,input);
 					System.out.println("resposta: " + resposta);
 				}else {

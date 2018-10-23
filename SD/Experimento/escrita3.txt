@@ -13,3 +13,4 @@ Oi eu sou o cliente 14 e quero escrever: INPUT
 Oi eu sou o cliente 18 e quero escrever: INPUT
 Oi eu sou o cliente 23 e quero escrever: INPUT
 Oi eu sou o cliente 29 e quero escrever: INPUT
+Estou preso nesse pc e preciso de ajuda
