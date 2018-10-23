@@ -41,6 +41,10 @@ public class Servidor implements Interface {
 			    resposta = future.get();
 			} catch (InterruptedException | ExecutionException e) {
 			    e.printStackTrace();
+
+			    resposta="Um erro ocorreu. Confira o nome do  arquivo ou tente  resetar o modem e esperar 10 minutos";
+
+			    return resposta;
 			}
 
 		count++;
@@ -73,8 +77,13 @@ public class Servidor implements Interface {
 
 		try {
 			    resposta = future.get();
+			    
 			} catch (InterruptedException | ExecutionException e) {
 			    e.printStackTrace();
+
+			    resposta="Um erro ocorreu. Confira o nome do  arquivo ou tente  resetar o modem e esperar 10 minutos";
+
+			    return resposta;
 			}
 
 		count++;

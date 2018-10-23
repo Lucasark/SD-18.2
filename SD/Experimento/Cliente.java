@@ -18,21 +18,21 @@ public class Cliente {
 				Registry registry = LocateRegistry.getRegistry(host);
 				Interface stub = (Interface) registry.lookup("Interface");
 				String resposta="";
-				if(operacao == "L") {
+				if(operacao.equals("L") || operacao.equals("l")) {
 					resposta = stub.lerArquivo(arqDestino);
 					System.out.println("resposta: " + resposta);
-				}else if(operacao == "E") {
+				}else if(operacao.equals("E") || operacao.equals("e")) {
 					System.out.println("O que qeur escrever?");
 					String input = in.nextLine();
 					resposta = stub.escreverArquivo(arqDestino,input);
 					System.out.println("resposta: " + resposta);
 				}else {
-					System.err.println("ERRO");
+					System.err.println("ERRO : " + operacao);
 				}
 				 //notar que aqui eh onde tamo dizendo o que chamar
 				
 			} catch (Exception e) {
-				System.err.println("Capturando a exceÃ§Ã£o no Cliente: " + e.toString());
+				System.err.println("Capturando a excecao no Cliente: " + e.toString());
 				e.printStackTrace();
 			}
 	}
