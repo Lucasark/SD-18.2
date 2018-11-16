@@ -1,0 +1,1 @@
+for /l %%N in (1 1 10) do call java Cliente L test.txt
